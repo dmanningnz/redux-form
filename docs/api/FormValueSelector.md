@@ -2,8 +2,8 @@
 
 [`View source on GitHub`](https://github.com/erikras/redux-form/blob/master/src/formValueSelector.js)
 
-> A "selector" API to make it easier to `connect()` to form values. `formValueSelector` _creates_
-a selector function for your form that can be used with your field names.
+> `formValueSelector` is a "selector" API to make it easier to `connect()` to form values. It _creates_
+a selector function that accepts field names and returns corresponding values from the named form.
 
 ## Importing
 
@@ -19,7 +19,7 @@ import { formValueSelector } from 'redux-form';  // ES6
 ### `form : String` [required]
 
 > The name of the form you are connecting to. Must be the same as the `form` config value you 
-gave to [`reduxForm()`](https://redux-form.com/6.8.0/docs/api/ReduxForm.md/).
+gave to [`reduxForm()`](https://redux-form.com/7.0.4/docs/api/ReduxForm.md/).
 
 ### `getFormState : Function` [optional]
 
@@ -80,7 +80,7 @@ connect(
 ### 3. Use the selector as `mapStateToProps`
 
 If you don't need any other props from the state, the selector itself works just fine as 
-`mapStateToProps`.
+`mapStateToProps` if you are selecting multiple fields.
 
 ```javascript
 connect(
@@ -91,4 +91,4 @@ connect(
 ## Example
 
 See the
-[Selecting Form Values](https://redux-form.com/6.8.0/examples/selectingFormValues/) example.
+[Selecting Form Values](https://redux-form.com/7.0.4/examples/selectingFormValues/) example.

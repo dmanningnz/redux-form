@@ -1,3 +1,4 @@
+// @flow
 import {
   ARRAY_INSERT,
   ARRAY_MOVE,
@@ -36,6 +37,7 @@ import {
 } from './actionTypes'
 import createDeleteInWithCleanUp from './deleteInWithCleanUp'
 import plain from './structure/plain'
+import type { Action, Structure } from './types.js.flow'
 
 const isReduxFormAction = action =>
   action &&
@@ -43,19 +45,22 @@ const isReduxFormAction = action =>
   action.type.length > prefix.length &&
   action.type.substring(0, prefix.length) === prefix
 
-const createReducer = structure => {
+function createReducer<M, L>(structure: Structure<M, L>) {
   const {
     deepEqual,
     empty,
+    forEach,
     getIn,
     setIn,
     deleteIn,
     fromJS,
     keys,
     size,
+    some,
     splice
   } = structure
   const deleteInWithCleanUp = createDeleteInWithCleanUp(structure)
+  const plainDeleteInWithCleanUp = createDeleteInWithCleanUp(plain)
   const doSplice = (state, key, field, index, removeNum, value, force) => {
     const existing = getIn(state, `${key}.${field}`)
     return existing || force
@@ -115,7 +120,7 @@ const createReducer = structure => {
     return result
   }
 
-  const behaviors = {
+  const behaviors: { [string]: { (state: any, action: Action): M } } = {
     [ARRAY_INSERT](state, { meta: { field, index }, payload }) {
       return arraySplice(state, field, index, 0, payload)
     },
@@ -179,7 +184,7 @@ const createReducer = structure => {
       return arraySplice(state, field, 0, 0, payload)
     },
     [AUTOFILL](state, { meta: { field }, payload }) {
-      let result = state
+      let result: any = state
       result = deleteInWithCleanUp(result, `asyncErrors.${field}`)
       result = deleteInWithCleanUp(result, `submitErrors.${field}`)
       result = setIn(result, `fields.${field}.autofilled`, true)
@@ -230,7 +235,10 @@ const createReducer = structure => {
       return deleteIn(state, 'triggerSubmit')
     },
     [CLEAR_SUBMIT_ERRORS](state) {
-      return deleteInWithCleanUp(state, 'submitErrors')
+      let result = state
+      result = deleteInWithCleanUp(result, 'submitErrors')
+      result = deleteIn(result, 'error')
+      return result
     },
     [CLEAR_ASYNC_ERROR](state, { meta: { field } }) {
       return deleteIn(state, `asyncErrors.${field}`)
@@ -294,18 +302,24 @@ const createReducer = structure => {
           // initialize action causes the field to become pristine. That effect
           // is what we want.
           //
-          keys(registeredFields).forEach(name => {
+          forEach(keys(registeredFields), name => {
             const previousInitialValue = getIn(previousInitialValues, name)
             const previousValue = getIn(previousValues, name)
 
             if (deepEqual(previousValue, previousInitialValue)) {
               // Overwrite the old pristine value with the new pristine value
               const newInitialValue = getIn(newInitialValues, name)
-              newValues = setIn(newValues, name, newInitialValue)
+
+              // This check prevents any 'setIn' call that would create useless
+              // nested objects, since the path to the new field value would
+              // evaluate to the same (especially for undefined values)
+              if (getIn(newValues, name) !== newInitialValue) {
+                newValues = setIn(newValues, name, newInitialValue)
+              }
             }
           })
 
-          keys(newInitialValues).forEach(name => {
+          forEach(keys(newInitialValues), name => {
             const previousInitialValue = getIn(previousInitialValues, name)
             if (typeof previousInitialValue === 'undefined') {
               // Add new values at the root level.
@@ -441,10 +455,26 @@ const createReducer = structure => {
         if (deepEqual(getIn(result, 'registeredFields'), empty)) {
           result = deleteIn(result, 'registeredFields')
         }
-        result = deleteInWithCleanUp(result, `syncErrors.${name}`)
+        let syncErrors = getIn(result, 'syncErrors')
+        if (syncErrors) {
+          syncErrors = plainDeleteInWithCleanUp(syncErrors, name)
+          if (plain.deepEqual(syncErrors, plain.empty)) {
+            result = deleteIn(result, 'syncErrors')
+          } else {
+            result = setIn(result, 'syncErrors', syncErrors)
+          }
+        }
+        let syncWarnings = getIn(result, 'syncWarnings')
+        if (syncWarnings) {
+          syncWarnings = plainDeleteInWithCleanUp(syncWarnings, name)
+          if (plain.deepEqual(syncWarnings, plain.empty)) {
+            result = deleteIn(result, 'syncWarnings')
+          } else {
+            result = setIn(result, 'syncWarnings', syncWarnings)
+          }
+        }
         result = deleteInWithCleanUp(result, `submitErrors.${name}`)
         result = deleteInWithCleanUp(result, `asyncErrors.${name}`)
-        result = deleteInWithCleanUp(result, `syncWarnings.${name}`)
       } else {
         field = setIn(field, 'count', count)
         result = setIn(result, key, field)
@@ -456,7 +486,7 @@ const createReducer = structure => {
       fields.forEach(
         field => (result = deleteIn(result, `fields.${field}.touched`))
       )
-      const anyTouched = keys(getIn(result, 'registeredFields')).some(key =>
+      const anyTouched = some(keys(getIn(result, 'registeredFields')), key =>
         getIn(result, `fields.${key}.touched`)
       )
       result = anyTouched
@@ -496,17 +526,20 @@ const createReducer = structure => {
     }
   }
 
-  const reducer = (state = empty, action) => {
+  const reducer = (state: any = empty, action: Action) => {
     const behavior = behaviors[action.type]
     return behavior ? behavior(state, action) : state
   }
 
-  const byForm = reducer => (state = empty, action = {}) => {
+  const byForm = reducer => (
+    state: any = empty,
+    action: Action = { type: 'NONE' }
+  ) => {
     const form = action && action.meta && action.meta.form
     if (!form || !isReduxFormAction(action)) {
       return state
     }
-    if (action.type === DESTROY) {
+    if (action.type === DESTROY && action.meta && action.meta.form) {
       return action.meta.form.reduce(
         (result, form) => deleteInWithCleanUp(result, form),
         state
@@ -523,7 +556,7 @@ const createReducer = structure => {
   function decorate(target) {
     target.plugin = function plugin(reducers) {
       // use 'function' keyword to enable 'this'
-      return decorate((state = empty, action = {}) =>
+      return decorate((state: any = empty, action: Action = { type: 'NONE' }) =>
         Object.keys(reducers).reduce((accumulator, key) => {
           const previousState = getIn(accumulator, key)
           const nextState = reducers[key](

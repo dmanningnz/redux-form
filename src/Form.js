@@ -1,8 +1,16 @@
+// @flow
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+import type { ReactContext } from './types'
 
-class Form extends Component {
-  constructor(props, context) {
+export type Props = {
+  onSubmit: Function
+}
+
+class Form extends Component<Props> {
+  context: ReactContext
+
+  constructor(props: Props, context: ReactContext) {
     super(props, context)
     if (!context._reduxForm) {
       throw new Error(

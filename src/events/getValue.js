@@ -1,4 +1,6 @@
+// @flow
 import isEvent from './isEvent'
+import type { Event } from '../types'
 
 const getSelectedValues = options => {
   const result = []
@@ -13,7 +15,7 @@ const getSelectedValues = options => {
   return result
 }
 
-const getValue = (event, isReactNative) => {
+const getValue = (event: Event, isReactNative: ?boolean) => {
   if (isEvent(event)) {
     if (
       !isReactNative &&
@@ -25,7 +27,11 @@ const getValue = (event, isReactNative) => {
     if (isReactNative && event.nativeEvent !== undefined) {
       return event.nativeEvent.text
     }
-    const { target: { type, value, checked, files }, dataTransfer } = event
+    const detypedEvent: any = event
+    const {
+      target: { type, value, checked, files },
+      dataTransfer
+    } = detypedEvent
     if (type === 'checkbox') {
       return checked || ''
     }

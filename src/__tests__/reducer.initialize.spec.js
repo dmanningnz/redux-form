@@ -1,4 +1,5 @@
-import { initialize } from '../actions'
+import actions from '../actions'
+const { initialize } = actions
 
 const describeInitialize = (reducer, expect, { fromJS }) => () => {
   it('should set initialize values on initialize on empty state', () => {
@@ -444,6 +445,52 @@ const describeInitialize = (reducer, expect, { fromJS }) => () => {
     expect(state).toEqualMap({
       foo: { registeredFields, values, initial }
     })
+  })
+
+  it('should not create empty object if new initial value is an empty array and keepDirty is set', () => {
+    const before = {
+      myForm: {
+        registeredFields: {
+          myList: { name: 'myList', type: 'Field', count: 0 },
+          'myList.0.name': { name: 'myList.0.name', type: 'Field', count: 0 }
+        },
+        values: {
+          myList: []
+        },
+        initial: {
+          myList: [{ name: '' }]
+        }
+      }
+    }
+
+    const actionInitialValues = {
+      myList: []
+    }
+    const actionKeepDirty = true
+
+    const state = reducer(
+      fromJS(before),
+      initialize('myForm', actionInitialValues, actionKeepDirty)
+    )
+
+    expect(state).toEqualMap(
+      {
+        myForm: {
+          registeredFields: {
+            myList: { name: 'myList', type: 'Field', count: 0 },
+            'myList.0.name': { name: 'myList.0.name', type: 'Field', count: 0 }
+          },
+          values: {
+            myList: []
+          },
+          initial: {
+            myList: []
+          }
+        }
+      },
+      null,
+      2
+    )
   })
 
   it('should add new pristine values at the root level', () => {

@@ -1,3 +1,4 @@
+// @flow
 import PropTypes from 'prop-types'
 
 const { any, bool, func, shape, string, oneOfType, object } = PropTypes
@@ -82,8 +83,7 @@ export const fieldMetaPropTypes = {
 
 export const fieldPropTypes = {
   input: shape(fieldInputPropTypes).isRequired,
-  meta: shape(fieldMetaPropTypes).isRequired,
-  custom: object.isRequired
+  meta: shape(fieldMetaPropTypes).isRequired
 }
 
 export default formPropTypes

@@ -1,5 +1,10 @@
 # Documentation Versions
 
+* [7.0.4](https://redux-form.com/7.0.4/)
+* [7.0.3](https://redux-form.com/7.0.3/)
+* [7.0.2](https://redux-form.com/7.0.2/)
+* [7.0.1](https://redux-form.com/7.0.1/)
+* [7.0.0](https://redux-form.com/7.0.0/)
 * [6.8.0](https://redux-form.com/6.8.0/)
 * [6.7.0](https://redux-form.com/6.7.0/)
 * [6.6.3](https://redux-form.com/6.6.3/)
@@ -36,7 +41,7 @@
 * [6.0.0-alpha.6](https://redux-form.com/6.0.0-alpha.6/)
 * [6.0.0-alpha.5](https://redux-form.com/6.0.0-alpha.5/)
 * [6.0.0-alpha.4](https://redux-form.com/6.0.0-alpha.4/)
-* [5.3.3](https://redux-form.com/5.3.3/)
+* [5.3.6](https://redux-form.com/5.3.6/)
 * [5.3.1](https://redux-form.com/5.3.1/)
 * [5.3.0](https://redux-form.com/5.3.0/)
 * [5.2.5](https://redux-form.com/5.2.5/)

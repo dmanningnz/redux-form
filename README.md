@@ -23,12 +23,12 @@
 
 ## Documentation
 
-* [Getting Started](https://redux-form.com/6.8.0/docs/GettingStarted.md/)
-* [Examples](https://redux-form.com/6.8.0/examples/)
-* [API](https://redux-form.com/6.8.0/docs/api/)
-* [FAQ](https://redux-form.com/6.8.0/docs/faq/)
+* [Getting Started](https://redux-form.com/7.0.4/docs/GettingStarted.md/)
+* [Examples](https://redux-form.com/7.0.4/examples/)
+* [API](https://redux-form.com/7.0.4/docs/api/)
+* [FAQ](https://redux-form.com/7.0.4/docs/faq/)
 * [Release Notes](https://github.com/erikras/redux-form/releases)
-* [Older Documentation](https://redux-form.com/6.8.0/docs/DocumentationVersions.md/)
+* [Older Documentation](https://redux-form.com/7.0.4/docs/DocumentationVersions.md/)
 
 ## 🏖 Code Sandboxes 🏖
 
@@ -51,3 +51,5 @@ You can play around with `redux-form` in these sandbox versions of the Examples.
 
 - [Abstracting Form State with Redux Form at JS Channel - Bengaluru 2016](https://youtu.be/eDTi7lYR1VU)
 [![Abstracting Form State with Redux Form at JS Channel - Bengaluru 2016](docs/video-thumb.jpg)](https://youtu.be/eDTi7lYR1VU)
+
+<a href="https://app.codesponsor.io/link/P3WjkUw9LiYdiQBdHrtHZSSL/erikras/redux-form" rel="nofollow"><img src="https://app.codesponsor.io/embed/P3WjkUw9LiYdiQBdHrtHZSSL/erikras/redux-form.svg" style="width: 888px; height: 68px;" alt="Sponsor" /></a>

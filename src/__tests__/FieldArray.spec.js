@@ -40,7 +40,11 @@ const describeFieldArray = (name, structure, combineReducers, expect) => {
     const store = makeStore({ testForm: state })
     class Form extends Component {
       render() {
-        return <div><FieldArray name="foo" component={TestComponent} /></div>
+        return (
+          <div>
+            <FieldArray name="foo" component={TestComponent} />
+          </div>
+        )
       }
     }
     const TestForm = reduxForm({ form: 'testForm', ...config })(Form)
@@ -470,7 +474,11 @@ const describeFieldArray = (name, structure, combineReducers, expect) => {
       })
       class Form extends Component {
         render() {
-          return <div><FieldArray name="foo" component={TestComponent} /></div>
+          return (
+            <div>
+              <FieldArray name="foo" component={TestComponent} />
+            </div>
+          )
         }
       }
       const TestForm = reduxForm({ form: 'testForm' })(Form)
@@ -493,7 +501,11 @@ const describeFieldArray = (name, structure, combineReducers, expect) => {
       })
       class Form extends Component {
         render() {
-          return <div><FieldArray name="foo" component={TestComponent} /></div>
+          return (
+            <div>
+              <FieldArray name="foo" component={TestComponent} />
+            </div>
+          )
         }
       }
       const TestForm = reduxForm({ form: 'testForm' })(Form)
@@ -519,7 +531,11 @@ const describeFieldArray = (name, structure, combineReducers, expect) => {
       })
       class Form extends Component {
         render() {
-          return <div><FieldArray name="foo" component={TestComponent} /></div>
+          return (
+            <div>
+              <FieldArray name="foo" component={TestComponent} />
+            </div>
+          )
         }
       }
       const TestForm = reduxForm({ form: 'testForm' })(Form)
@@ -545,7 +561,11 @@ const describeFieldArray = (name, structure, combineReducers, expect) => {
       })
       class Form extends Component {
         render() {
-          return <div><FieldArray name="foo" component={TestComponent} /></div>
+          return (
+            <div>
+              <FieldArray name="foo" component={TestComponent} />
+            </div>
+          )
         }
       }
       const TestForm = reduxForm({ form: 'testForm' })(Form)
@@ -571,7 +591,11 @@ const describeFieldArray = (name, structure, combineReducers, expect) => {
       })
       class Form extends Component {
         render() {
-          return <div><FieldArray name="foo" component={TestComponent} /></div>
+          return (
+            <div>
+              <FieldArray name="foo" component={TestComponent} />
+            </div>
+          )
         }
       }
       const TestForm = reduxForm({ form: 'testForm' })(Form)
@@ -597,7 +621,11 @@ const describeFieldArray = (name, structure, combineReducers, expect) => {
       })
       class Form extends Component {
         render() {
-          return <div><FieldArray name="foo" component={TestComponent} /></div>
+          return (
+            <div>
+              <FieldArray name="foo" component={TestComponent} />
+            </div>
+          )
         }
       }
       const TestForm = reduxForm({ form: 'testForm' })(Form)
@@ -663,7 +691,9 @@ const describeFieldArray = (name, structure, combineReducers, expect) => {
         </Provider>
       )
       const error = TestUtils.findRenderedDOMComponentWithTag(dom, 'strong')
-      domExpect(error).toExist().toHaveText('Too awesome!')
+      domExpect(error)
+        .toExist()
+        .toHaveText('Too awesome!')
     })
 
     it('should provide sync warning for array field', () => {
@@ -719,7 +749,9 @@ const describeFieldArray = (name, structure, combineReducers, expect) => {
         </Provider>
       )
       const warning = TestUtils.findRenderedDOMComponentWithTag(dom, 'strong')
-      domExpect(warning).toExist().toHaveText('Too awesome!')
+      domExpect(warning)
+        .toExist()
+        .toHaveText('Too awesome!')
     })
 
     it('should reconnect when name changes', () => {
@@ -1332,7 +1364,9 @@ const describeFieldArray = (name, structure, combineReducers, expect) => {
           {fields.map(field => (
             <Field name={field} component={renderField} key={field} />
           ))}
-          <button className="add" onClick={() => fields.push()}>Add Dog</button>
+          <button className="add" onClick={() => fields.push()}>
+            Add Dog
+          </button>
           <button className="remove" onClick={() => fields.pop()}>
             Remove Dog
           </button>
@@ -1504,7 +1538,9 @@ const describeFieldArray = (name, structure, combineReducers, expect) => {
       const renderFieldArray = createSpy(({ fields }) => (
         <div>
           {fields.map((field, index) => <div key={index}>{field}</div>)}
-          <button className="add" onClick={() => fields.push()}>Add Dog</button>
+          <button className="add" onClick={() => fields.push()}>
+            Add Dog
+          </button>
           <button className="remove" onClick={() => fields.pop()}>
             Remove Dog
           </button>
@@ -1600,8 +1636,9 @@ const describeFieldArray = (name, structure, combineReducers, expect) => {
         <div>
           {fields.map((field, index) => (
             <div key={index}>
-              {getIn(fields.get(index), 'hasCollar') &&
-                <span className="collar" />}
+              {getIn(fields.get(index), 'hasCollar') && (
+                <span className="collar" />
+              )}
               <Field
                 name={`${field}.hasCollar`}
                 component="input"
@@ -1610,7 +1647,9 @@ const describeFieldArray = (name, structure, combineReducers, expect) => {
               <Field name={`${field}.name`} component="input" />
             </div>
           ))}
-          <button className="add" onClick={() => fields.push()}>Add Dog</button>
+          <button className="add" onClick={() => fields.push()}>
+            Add Dog
+          </button>
           <button className="remove" onClick={() => fields.pop()}>
             Remove Dog
           </button>
@@ -1752,6 +1791,83 @@ const describeFieldArray = (name, structure, combineReducers, expect) => {
       expect(renderField.calls.length).toBe(3)
       expect(renderField.calls[2].arguments[0].input.name).toBe('dogs[0]')
       expect(renderField.calls[2].arguments[0].input.value).toBe('Odie')
+
+      // field array rerendered
+      expect(renderFieldArray.calls.length).toBe(2)
+    })
+
+    it('should rerender when a value changes if rerenderOnEveryChange is set and FieldArray has multiple groups with same values', () => {
+      const store = makeStore({
+        testForm: {
+          values: {
+            dogs: [
+              {
+                name: 'Fido',
+                owner: 'Alex'
+              },
+              {
+                name: 'Odie',
+                owner: 'Alex'
+              },
+              {
+                name: 'Fido',
+                owner: 'Alex'
+              },
+              {
+                name: 'Snoopy',
+                owner: 'Alex'
+              }
+            ]
+          }
+        }
+      })
+      const renderField = createSpy(props => (
+        <input {...props.input} />
+      )).andCallThrough()
+      const renderFieldArray = createSpy(({ fields }) => (
+        <div>
+          {fields.map(member => (
+            <div key={member}>
+              <Field name={`${member}.name`} component={renderField} />
+              <Field name={`${member}.owner`} component={renderField} />
+            </div>
+          ))}
+        </div>
+      )).andCallThrough()
+      class Form extends Component {
+        render() {
+          return (
+            <FieldArray
+              name="dogs"
+              component={renderFieldArray}
+              rerenderOnEveryChange
+            />
+          )
+        }
+      }
+      const TestForm = reduxForm({ form: 'testForm' })(Form)
+      TestUtils.renderIntoDocument(
+        <Provider store={store}>
+          <TestForm />
+        </Provider>
+      )
+
+      // field array rendered
+      expect(renderFieldArray).toHaveBeenCalled()
+      expect(renderFieldArray.calls.length).toBe(1)
+
+      // both fields rendered
+      expect(renderField).toHaveBeenCalled()
+      expect(renderField.calls.length).toBe(8)
+      expect(renderField.calls[0].arguments[0].input.value).toBe('Fido')
+
+      // change first name field
+      renderField.calls[0].arguments[0].input.onChange('Odie')
+
+      // first name field rerendered, other fields is NOT
+      expect(renderField.calls.length).toBe(9)
+      expect(renderField.calls[8].arguments[0].input.name).toBe('dogs[0].name')
+      expect(renderField.calls[8].arguments[0].input.value).toBe('Odie')
 
       // field array rerendered
       expect(renderFieldArray.calls.length).toBe(2)

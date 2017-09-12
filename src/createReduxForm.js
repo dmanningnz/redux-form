@@ -1,3 +1,4 @@
+// @flow
 import hoistStatics from 'hoist-non-react-statics'
 import isPromise from 'is-promise'
 import { mapValues, merge } from 'lodash'
@@ -5,7 +6,7 @@ import PropTypes from 'prop-types'
 import { Component, createElement } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import * as importedActions from './actions'
+import importedActions from './actions'
 import asyncValidation from './asyncValidation'
 import defaultShouldAsyncValidate from './defaultShouldAsyncValidate'
 import defaultShouldValidate from './defaultShouldValidate'
@@ -16,8 +17,20 @@ import handleSubmit from './handleSubmit'
 import createIsValid from './selectors/isValid'
 import plain from './structure/plain'
 import getDisplayName from './util/getDisplayName'
+import type { ComponentType } from 'react'
+import type { Dispatch } from 'redux'
+import type {
+  ConnectedComponent,
+  ReactContext,
+  GetFormState,
+  FieldType,
+  Structure,
+  Values
+} from './types'
+import type { Params as ShouldAsyncValidateParams } from './defaultShouldAsyncValidate'
+import type { Params as ShouldValidateParams } from './defaultShouldValidate'
 
-const isClassComponent = Component =>
+const isClassComponent = (Component: ?any) =>
   Boolean(
     Component &&
       Component.prototype &&
@@ -75,13 +88,179 @@ const checkSubmit = submit => {
   return submit
 }
 
+type OnSubmitFail = (
+  errors: ?Object,
+  dispatch: Dispatch<*>,
+  submitError: ?any,
+  props: Object
+) => void
+type OnSubmitSuccess = (
+  result: ?any,
+  dispatch: Dispatch<*>,
+  props: Object
+) => void
+type InitializeAction = (
+  initialValues: ?Values,
+  keepDirty: boolean,
+  otherMeta: ?Object
+) => void
+type FocusAction = (field: string) => void
+type ChangeAction = (field: string, value: any) => void
+type BlurAction = (field: string, value: any) => void
+type ArrayUnshiftAction = (field: string, value: any) => void
+type ArrayShiftAction = (field: string) => void
+type ArraySpliceAction = (
+  field: string,
+  index: number,
+  removeNum: number,
+  value: any
+) => void
+type ArrayInsertAction = (field: string, index: number, value: any) => void
+type ArrayMoveAction = (field: string, from: number, to: number) => void
+type ArrayPopAction = (field: string) => void
+type ArrayPushAction = (field: string, value: any) => void
+type ArrayRemoveAction = (field: string, index: number) => void
+type ArrayRemoveAllAction = (field: string) => void
+type ArraySwapAction = (field: string, indexA: number, indexB: number) => void
+type ClearSubmitAction = () => void
+type DestroyAction = () => void
+type RegisterFieldAction = (name: string, type: FieldType) => void
+type UnregisterFieldAction = (name: string, destroyOnUnmount: ?boolean) => void
+type ResetAction = () => void
+type SetSubmitFailedAction = (...fields: string[]) => void
+type SetSubmitSucceededAction = (...fields: string[]) => void
+type StartAsyncValidationAction = (field: string) => void
+type StopAsyncValidationAction = (errors: ?Object) => void
+type StopSubmitAction = (errors: ?Object) => void
+type StartSubmitAction = () => void
+type TouchAction = (...fields: string[]) => void
+type UntouchAction = (...fields: string[]) => void
+type UpdateSyncErrorsAction = (syncErrors: ?Object, error: ?any) => void
+type UpdateSyncWarningsAction = (syncErrors: ?Object, error: ?any) => void
+type OnSubmitFunction = (
+  values: Values,
+  dispatch: Dispatch<*>,
+  props: Object
+) => Promise<*> | void
+type AsyncValidateFunction = (
+  values: Values,
+  dispatch: Dispatch<*>,
+  props: Object,
+  blurredField: ?string
+) => Promise<void>
+type ValidateFunction = (values: Values, props: Object) => Object
+type ShouldAsyncValidateFunction = (
+  params: ShouldAsyncValidateParams
+) => boolean
+type ShouldValidateFunction = (params: ShouldValidateParams) => boolean
+type OnChangeFunction = (
+  values: Values,
+  dispatch: Dispatch<*>,
+  props: Object
+) => void
+
+export type Config = {
+  asyncBlurFields?: string[],
+  destroyOnUnmount?: boolean,
+  forceUnregisterOnUnmount?: boolean,
+  enableReinitialize?: boolean,
+  keepDirtyOnReinitialize?: boolean,
+  form: string,
+  initialValues?: Values,
+  getFormState?: GetFormState,
+  onChange?: OnChangeFunction,
+  onSubmit?: OnSubmitFunction,
+  onSubmitFail?: OnSubmitFail,
+  onSubmitSuccess?: OnSubmitSuccess,
+  propNamespace?: string,
+  validate?: ValidateFunction,
+  warn?: ValidateFunction,
+  touchOnBlur?: boolean,
+  touchOnChange?: boolean,
+  persistentSubmitErrors?: boolean,
+  registeredFields: any
+}
+
+export type Props = {
+  anyTouched: boolean,
+  arrayInsert: ArrayInsertAction,
+  arrayMove: ArrayMoveAction,
+  arrayPop: ArrayPopAction,
+  arrayPush: ArrayPushAction,
+  arrayRemove: ArrayRemoveAction,
+  arrayRemoveAll: ArrayRemoveAllAction,
+  arrayShift: ArrayShiftAction,
+  arraySplice: ArraySpliceAction,
+  arraySwap: ArraySwapAction,
+  arrayUnshift: ArrayUnshiftAction,
+  asyncBlurFields?: string[],
+  asyncErrors?: any,
+  asyncValidate: AsyncValidateFunction,
+  asyncValidating: boolean,
+  blur: BlurAction,
+  change: ChangeAction,
+  clearSubmit: ClearSubmitAction,
+  destroy: DestroyAction,
+  destroyOnUnmount: boolean,
+  forceUnregisterOnUnmount: boolean,
+  dirty: boolean,
+  dispatch: Dispatch<*>,
+  enableReinitialize: boolean,
+  error?: any,
+  focus: FocusAction,
+  form: string,
+  getFormState: GetFormState,
+  initialize: InitializeAction,
+  initialized: boolean,
+  initialValues?: any,
+  invalid: boolean,
+  keepDirtyOnReinitialize: any,
+  onChange?: OnChangeFunction,
+  onSubmit?: OnSubmitFunction,
+  onSubmitFail?: OnSubmitFail,
+  onSubmitSuccess?: OnSubmitSuccess,
+  pristine: boolean,
+  propNamespace?: string,
+  registeredFields: Array<{ name: string, type: FieldType, count: number }>,
+  registerField: RegisterFieldAction,
+  reset: ResetAction,
+  setSubmitFailed: SetSubmitFailedAction,
+  setSubmitSucceeded: SetSubmitSucceededAction,
+  shouldAsyncValidate: ShouldAsyncValidateFunction,
+  shouldValidate: ShouldValidateFunction,
+  startAsyncValidation: StartAsyncValidationAction,
+  startSubmit: StartSubmitAction,
+  stopAsyncValidation: StopAsyncValidationAction,
+  stopSubmit: StopSubmitAction,
+  submitting: boolean,
+  submitFailed: boolean,
+  submitSucceeded: boolean,
+  touch: TouchAction,
+  touchOnBlur: boolean,
+  touchOnChange: boolean,
+  triggerSubmit?: boolean,
+  persistentSubmitErrors: boolean,
+  syncErrors?: Object,
+  syncWarnings?: Object,
+  unregisterField: UnregisterFieldAction,
+  untouch: UntouchAction,
+  updateSyncErrors: UpdateSyncErrorsAction,
+  updateSyncWarnings: UpdateSyncWarningsAction,
+  valid: boolean,
+  validate: ValidateFunction,
+  validExceptSubmit: boolean,
+  values: Values,
+  warn: ValidateFunction,
+  warning: any
+}
+
 /**
  * The decorator that is the main API to redux-form
  */
-const createReduxForm = structure => {
+const createReduxForm = (structure: Structure<*, *>) => {
   const { deepEqual, empty, getIn, setIn, keys, fromJS } = structure
   const isValid = createIsValid(structure)
-  return initialConfig => {
+  return (initialConfig: Config) => {
     const config = {
       touchOnBlur: true,
       touchOnChange: false,
@@ -97,23 +276,19 @@ const createReduxForm = structure => {
       ...initialConfig
     }
 
-    return WrappedComponent => {
-      class Form extends Component {
-        constructor(props) {
-          super(props)
-          this.submit = this.submit.bind(this)
-          this.reset = this.reset.bind(this)
-          this.asyncValidate = this.asyncValidate.bind(this)
-          this.getValues = this.getValues.bind(this)
-          this.register = this.register.bind(this)
-          this.unregister = this.unregister.bind(this)
-          this.submitCompleted = this.submitCompleted.bind(this)
-          this.submitFailed = this.submitFailed.bind(this)
-          this.fieldValidators = {}
-          this.lastFieldValidatorKeys = []
-          this.fieldWarners = {}
-          this.lastFieldWarnerKeys = []
-        }
+    return (WrappedComponent: ComponentType<*>) => {
+      class Form extends Component<Props> {
+        static WrappedComponent: ComponentType<*>
+
+        context: ReactContext
+
+        destroyed = false
+        fieldValidators = {}
+        lastFieldValidatorKeys = []
+        fieldWarners = {}
+        lastFieldWarnerKeys = []
+        innerOnSubmit = undefined
+        submitPromise = undefined
 
         getChildContext() {
           return {
@@ -132,7 +307,7 @@ const createReduxForm = structure => {
           }
         }
 
-        initIfNeeded(nextProps) {
+        initIfNeeded(nextProps: ?Props) {
           const { enableReinitialize } = this.props
           if (nextProps) {
             if (
@@ -156,7 +331,11 @@ const createReduxForm = structure => {
           }
         }
 
-        updateSyncErrorsIfNeeded(nextSyncErrors, nextError, lastSyncErrors) {
+        updateSyncErrorsIfNeeded(
+          nextSyncErrors: ?Object,
+          nextError: ?any,
+          lastSyncErrors: ?Object
+        ) {
           const { error, updateSyncErrors } = this.props
           const noErrors =
             (!lastSyncErrors || !Object.keys(lastSyncErrors).length) && !error
@@ -172,14 +351,14 @@ const createReduxForm = structure => {
           }
         }
 
-        clearSubmitPromiseIfNeeded(nextProps) {
+        clearSubmitPromiseIfNeeded(nextProps: Props) {
           const { submitting } = this.props
           if (this.submitPromise && submitting && !nextProps.submitting) {
             delete this.submitPromise
           }
         }
 
-        submitIfNeeded(nextProps) {
+        submitIfNeeded(nextProps: Props) {
           const { clearSubmit, triggerSubmit } = this.props
           if (!triggerSubmit && nextProps.triggerSubmit) {
             clearSubmit()
@@ -187,7 +366,7 @@ const createReduxForm = structure => {
           }
         }
 
-        validateIfNeeded(nextProps) {
+        validateIfNeeded(nextProps: ?Props) {
           const { shouldValidate, validate, values } = this.props
           const fieldLevelValidate = this.generateValidator()
           if (validate || fieldLevelValidate) {
@@ -204,7 +383,8 @@ const createReduxForm = structure => {
             })
 
             if (shouldValidateResult) {
-              const propsToValidate = initialRender ? this.props : nextProps
+              const propsToValidate =
+                initialRender || !nextProps ? this.props : nextProps
               const { _error, ...nextSyncErrors } = merge(
                 validate
                   ? validate(propsToValidate.values, propsToValidate) || {}
@@ -227,9 +407,9 @@ const createReduxForm = structure => {
         }
 
         updateSyncWarningsIfNeeded(
-          nextSyncWarnings,
-          nextWarning,
-          lastSyncWarnings
+          nextSyncWarnings: ?Object,
+          nextWarning: any,
+          lastSyncWarnings: ?Object
         ) {
           const { warning, syncWarnings, updateSyncWarnings } = this.props
           const noWarnings =
@@ -246,7 +426,7 @@ const createReduxForm = structure => {
           }
         }
 
-        warnIfNeeded(nextProps) {
+        warnIfNeeded(nextProps: ?Props) {
           const { shouldValidate, warn, values } = this.props
           const fieldLevelWarn = this.generateWarner()
           if (warn || fieldLevelWarn) {
@@ -263,7 +443,8 @@ const createReduxForm = structure => {
             })
 
             if (shouldWarnResult) {
-              const propsToWarn = initialRender ? this.props : nextProps
+              const propsToWarn =
+                initialRender || !nextProps ? this.props : nextProps
               const { _warning, ...nextSyncWarnings } = merge(
                 warn ? warn(propsToWarn.values, propsToWarn) : {},
                 fieldLevelWarn
@@ -286,24 +467,19 @@ const createReduxForm = structure => {
           this.warnIfNeeded()
         }
 
-        componentWillReceiveProps(nextProps) {
+        componentWillReceiveProps(nextProps: Props) {
           this.initIfNeeded(nextProps)
           this.validateIfNeeded(nextProps)
           this.warnIfNeeded(nextProps)
           this.clearSubmitPromiseIfNeeded(nextProps)
           this.submitIfNeeded(nextProps)
-          if (nextProps.onChange) {
-            if (!deepEqual(nextProps.values, this.props.values)) {
-              nextProps.onChange(
-                nextProps.values,
-                nextProps.dispatch,
-                nextProps
-              )
-            }
+          const { onChange, values, dispatch } = nextProps
+          if (onChange && !deepEqual(values, this.props.values)) {
+            onChange(values, dispatch, nextProps)
           }
         }
 
-        shouldComponentUpdate(nextProps) {
+        shouldComponentUpdate(nextProps: Props): boolean {
           if (!this.props.pure) return true
           const { immutableProps = [] } = config
           return Object.keys(nextProps).some(prop => {
@@ -329,19 +505,18 @@ const createReduxForm = structure => {
           }
         }
 
-        getValues() {
-          return this.props.values
-        }
+        getValues = (): Values => this.props.values
 
-        isValid() {
-          return this.props.valid
-        }
+        isValid = (): boolean => this.props.valid
 
-        isPristine() {
-          return this.props.pristine
-        }
+        isPristine = (): boolean => this.props.pristine
 
-        register(name, type, getValidator, getWarner) {
+        register = (
+          name: string,
+          type: FieldType,
+          getValidator: Function,
+          getWarner: Function
+        ) => {
           this.props.registerField(name, type)
           if (getValidator) {
             this.fieldValidators[name] = getValidator
@@ -351,7 +526,7 @@ const createReduxForm = structure => {
           }
         }
 
-        unregister(name) {
+        unregister = (name: string) => {
           if (!this.destroyed) {
             if (
               this.props.destroyOnUnmount ||
@@ -366,7 +541,7 @@ const createReduxForm = structure => {
           }
         }
 
-        getFieldList(options) {
+        getFieldList = (options: Object): string[] => {
           let registeredFields = this.props.registeredFields
           let list = []
           if (!registeredFields) {
@@ -387,7 +562,7 @@ const createReduxForm = structure => {
           )
         }
 
-        getValidators() {
+        getValidators = (): Object => {
           const validators = {}
           Object.keys(this.fieldValidators).forEach(name => {
             const validator = this.fieldValidators[name]()
@@ -398,14 +573,14 @@ const createReduxForm = structure => {
           return validators
         }
 
-        generateValidator() {
+        generateValidator = (): ?Function => {
           const validators = this.getValidators()
           return Object.keys(validators).length
             ? generateValidator(validators, structure)
             : undefined
         }
 
-        getWarners() {
+        getWarners = (): Object => {
           const warners = {}
           Object.keys(this.fieldWarners).forEach(name => {
             const warner = this.fieldWarners[name]()
@@ -416,14 +591,14 @@ const createReduxForm = structure => {
           return warners
         }
 
-        generateWarner() {
+        generateWarner = (): ?Function => {
           const warners = this.getWarners()
           return Object.keys(warners).length
             ? generateValidator(warners, structure)
             : undefined
         }
 
-        asyncValidate(name, value) {
+        asyncValidate = (name: string, value: any) => {
           const {
             asyncBlurFields,
             asyncErrors,
@@ -469,17 +644,17 @@ const createReduxForm = structure => {
           }
         }
 
-        submitCompleted(result) {
+        submitCompleted = (result: any): any => {
           delete this.submitPromise
           return result
         }
 
-        submitFailed(error) {
+        submitFailed = (error: any): void => {
           delete this.submitPromise
-          throw error
+          return error
         }
 
-        listenToSubmit(promise) {
+        listenToSubmit = (promise: any) => {
           if (!isPromise(promise)) {
             return promise
           }
@@ -487,7 +662,7 @@ const createReduxForm = structure => {
           return promise.then(this.submitCompleted, this.submitFailed)
         }
 
-        submit(submitOrEvent) {
+        submit = (submitOrEvent: any): any => {
           const { onSubmit, blur, change, dispatch } = this.props
 
           if (!submitOrEvent || silenceEvent(submitOrEvent)) {
@@ -534,9 +709,7 @@ const createReduxForm = structure => {
           }
         }
 
-        reset() {
-          this.props.reset()
-        }
+        reset = (): void => this.props.reset()
 
         render() {
           // remove some redux-form config-only props
@@ -558,6 +731,7 @@ const createReduxForm = structure => {
             asyncValidating,
             blur,
             change,
+            clearSubmit,
             destroy,
             destroyOnUnmount,
             forceUnregisterOnUnmount,
@@ -611,6 +785,7 @@ const createReduxForm = structure => {
             asyncValidate: this.asyncValidate,
             asyncValidating,
             ...bindActionCreators({ blur, change }, dispatch),
+            clearSubmit,
             destroy,
             dirty,
             dispatch,
@@ -656,7 +831,7 @@ const createReduxForm = structure => {
         getFormState: PropTypes.func,
         onSubmitFail: PropTypes.func,
         onSubmitSuccess: PropTypes.func,
-        propNameSpace: PropTypes.string,
+        propNamespace: PropTypes.string,
         validate: PropTypes.func,
         warn: PropTypes.func,
         touchOnBlur: PropTypes.bool,
@@ -700,8 +875,8 @@ const createReduxForm = structure => {
 
           const pristine = shouldResetValues || deepEqual(initial, values)
           const asyncErrors = getIn(formState, 'asyncErrors')
-          const syncErrors = getIn(formState, 'syncErrors') || empty
-          const syncWarnings = getIn(formState, 'syncWarnings') || empty
+          const syncErrors = getIn(formState, 'syncErrors') || {}
+          const syncWarnings = getIn(formState, 'syncWarnings') || {}
           const registeredFields = getIn(formState, 'registeredFields')
           const valid = isValid(form, getFormState, false)(state)
           const validExceptSubmit = isValid(form, getFormState, true)(state)
@@ -790,50 +965,54 @@ const createReduxForm = structure => {
       ConnectedForm.defaultProps = config
 
       // build outer component to expose instance api
-      return class ReduxForm extends Component {
+      return class ReduxForm extends Component<Props> {
+        ref: ?ConnectedComponent<Form>
+
         submit() {
-          return this.refs.wrapped.getWrappedInstance().submit()
+          return this.ref && this.ref.getWrappedInstance().submit()
         }
 
-        reset() {
-          return this.refs.wrapped.getWrappedInstance().reset()
+        reset(): void {
+          if (this.ref) {
+            this.ref.getWrappedInstance().reset()
+          }
         }
 
-        get valid() {
-          return this.refs.wrapped.getWrappedInstance().isValid()
+        get valid(): boolean {
+          return !!(this.ref && this.ref.getWrappedInstance().isValid())
         }
 
-        get invalid() {
+        get invalid(): boolean {
           return !this.valid
         }
 
-        get pristine() {
-          return this.refs.wrapped.getWrappedInstance().isPristine()
+        get pristine(): boolean {
+          return !!(this.ref && this.ref.getWrappedInstance().isPristine())
         }
 
-        get dirty() {
+        get dirty(): boolean {
           return !this.pristine
         }
 
-        get values() {
-          return this.refs.wrapped.getWrappedInstance().getValues()
+        get values(): Values {
+          return this.ref ? this.ref.getWrappedInstance().getValues() : empty
         }
 
-        get fieldList() {
+        get fieldList(): string[] {
           // mainly provided for testing
-          return this.refs.wrapped.getWrappedInstance().getFieldList()
+          return this.ref ? this.ref.getWrappedInstance().getFieldList() : []
         }
 
-        get wrappedInstance() {
+        get wrappedInstance(): ?Component<*, *> {
           // for testing
-          return this.refs.wrapped.getWrappedInstance().refs.wrapped
+          return this.ref && this.ref.getWrappedInstance().refs.wrapped
         }
 
         render() {
           const { initialValues, ...rest } = this.props
           return createElement(ConnectedForm, {
             ...rest,
-            ref: 'wrapped',
+            ref: (ref: ?ConnectedComponent<Form>) => (this.ref = ref),
             // convert initialValues if need to
             initialValues: fromJS(initialValues)
           })
