@@ -2107,7 +2107,7 @@ const describeField = (name, structure, combineReducers, setup) => {
     //  expect(usernameInput.calls[2].arguments[0].meta.error).toBe(undefined)
     //})
 
-    it('should update field level validation when validate prop changes', () => {
+    it('should update field level validation when validate prop is added', () => {
       const store = makeStore()
       const usernameInput = jest.fn(props => <input {...props.input} />)
       const required = jest.fn(
@@ -2158,6 +2158,157 @@ const describeField = (name, structure, combineReducers, setup) => {
         usernameInput.mock.calls[usernameInput.mock.calls.length - 1][0].meta
           .valid
       ).toBe(false)
+      expect(
+        usernameInput.mock.calls[usernameInput.mock.calls.length - 1][0].meta
+          .error
+      ).toBe('Required')
+    })
+
+    it('should update field level validation when validate prop changes', () => {
+      const store = makeStore()
+      const usernameInput = jest.fn(props => <input {...props.input} />)
+      const invalid = jest.fn(value => 'Invalid')
+      const required = jest.fn(value => 'Required')
+      class Form extends Component {
+        constructor() {
+          super()
+          this.state = { validate: invalid }
+        }
+
+        render() {
+          return (
+            <div>
+              <Field
+                name="username"
+                component={usernameInput}
+                validate={this.state.validate}
+              />
+              <button onClick={() => this.setState({ validate: required })}>
+                Change
+              </button>
+            </div>
+          )
+        }
+      }
+      const TestForm = reduxForm({
+        form: 'testForm'
+      })(Form)
+      const dom = TestUtils.renderIntoDocument(
+        <Provider store={store}>
+          <TestForm />
+        </Provider>
+      )
+
+      expect(
+        usernameInput.mock.calls[usernameInput.mock.calls.length - 1][0].meta
+          .error
+      ).toBe('Invalid')
+
+      // update validate prop
+      const button = TestUtils.findRenderedDOMComponentWithTag(dom, 'button')
+      TestUtils.Simulate.click(button)
+
+      expect(
+        usernameInput.mock.calls[usernameInput.mock.calls.length - 1][0].meta
+          .error
+      ).toBe('Required')
+    })
+
+    it('should should dynamic field validation functions', () => {
+      const store = makeStore()
+      const usernameInput = jest.fn(props => <input {...props.input} />)
+      const invalid = jest.fn(value => () => 'Invalid')
+      const required = jest.fn(value => () => 'Required')
+      class Form extends Component {
+        constructor() {
+          super()
+          this.state = { validate: invalid }
+        }
+
+        render() {
+          return (
+            <div>
+              <Field
+                name="username"
+                component={usernameInput}
+                validate={this.state.validate()}
+              />
+              <button onClick={() => this.setState({ validate: required })}>
+                Change
+              </button>
+            </div>
+          )
+        }
+      }
+      const TestForm = reduxForm({
+        form: 'testForm'
+      })(Form)
+      const dom = TestUtils.renderIntoDocument(
+        <Provider store={store}>
+          <TestForm />
+        </Provider>
+      )
+
+      expect(
+        usernameInput.mock.calls[usernameInput.mock.calls.length - 1][0].meta
+          .error
+      ).toBe('Invalid')
+
+      // update validate prop
+      const button = TestUtils.findRenderedDOMComponentWithTag(dom, 'button')
+      TestUtils.Simulate.click(button)
+
+      expect(
+        usernameInput.mock.calls[usernameInput.mock.calls.length - 1][0].meta
+          .error
+      ).toBe('Required')
+    })
+
+    it('should retain validation when name changes', () => {
+      const store = makeStore()
+      const usernameInput = jest.fn(props => <input {...props.input} />)
+      const required = jest.fn(value => 'Required')
+      class Form extends Component {
+        constructor() {
+          super()
+          this.state = { name: 'orig-name' }
+        }
+
+        render() {
+          return (
+            <div>
+              <Field
+                name={this.state.name}
+                component={usernameInput}
+                validate={required}
+              />
+              <button onClick={() => this.setState({ name: 'new-name' })}>
+                Change
+              </button>
+            </div>
+          )
+        }
+      }
+      const TestForm = reduxForm({
+        form: 'testForm'
+      })(Form)
+      const dom = TestUtils.renderIntoDocument(
+        <Provider store={store}>
+          <TestForm />
+        </Provider>
+      )
+
+      // field is required
+      expect(
+        usernameInput.mock.calls[usernameInput.mock.calls.length - 1][0].meta
+          .error
+      ).toBe('Required')
+
+      // update field name
+      const button = TestUtils.findRenderedDOMComponentWithTag(dom, 'button')
+      TestUtils.Simulate.click(button)
+
+      // renamed field is still required
       expect(
         usernameInput.mock.calls[usernameInput.mock.calls.length - 1][0].meta
           .error

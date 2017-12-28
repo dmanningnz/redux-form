@@ -319,7 +319,8 @@ const createReduxForm = (structure: Structure<*, *>) => {
               register: this.register,
               unregister: this.unregister,
               registerInnerOnSubmit: innerOnSubmit =>
-                (this.innerOnSubmit = innerOnSubmit)
+                (this.innerOnSubmit = innerOnSubmit),
+              fieldDidUpdate: this.fieldDidUpdate,
             }
           }
         }
@@ -561,6 +562,11 @@ const createReduxForm = (structure: Structure<*, *>) => {
         isValid = (): boolean => this.props.valid
 
         isPristine = (): boolean => this.props.pristine
+
+        fieldDidUpdate = () => {
+          this.validateIfNeeded()
+          this.warnIfNeeded()
+        }
 
         register = (
           name: string,
