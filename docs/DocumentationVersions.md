@@ -1,5 +1,9 @@
 # Documentation Versions
 
+* [7.2.0](https://redux-form.com/7.2.0/)
+* [7.1.2](https://redux-form.com/7.1.2/)
+* [7.1.1](https://redux-form.com/7.1.1/)
+* [7.1.0](https://redux-form.com/7.1.0/)
 * [7.0.4](https://redux-form.com/7.0.4/)
 * [7.0.3](https://redux-form.com/7.0.3/)
 * [7.0.2](https://redux-form.com/7.0.2/)

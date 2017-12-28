@@ -34,19 +34,19 @@ let render = () => {
   const raw = require('!!raw-loader!./AsyncValidationForm')
   const rawValidate = require('!!raw-loader!./validate')
   const rawAsyncValidate = require('!!raw-loader!./asyncValidate')
-  ReactDOM.render(
+  ReactDOM.hydrate(
     <Provider store={store}>
       <App
         /**
          * This <App/> component only provides the site wrapper.
          * Remove it on your dev server if you wish. It will not affect the functionality.
          */
-        version="7.0.4"
+        version="7.2.0"
         path="/examples/asyncValidation"
         breadcrumbs={generateExampleBreadcrumbs(
           'asyncValidation',
           'Async Validation Example',
-          '7.0.4'
+          '7.2.0'
         )}
       >
         <Markdown content={readme} />
@@ -93,7 +93,7 @@ if (module.hot) {
   const renderApp = render
   const renderError = error => {
     const RedBox = require('redbox-react')
-    ReactDOM.render(<RedBox error={error} className="redbox" />, dest)
+    ReactDOM.hydrate(<RedBox error={error} className="redbox" />, dest)
   }
   render = () => {
     try {

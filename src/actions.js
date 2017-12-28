@@ -21,6 +21,7 @@ import {
   INITIALIZE,
   REGISTER_FIELD,
   RESET,
+  CLEAR_FIELDS,
   SET_SUBMIT_FAILED,
   SET_SUBMIT_SUCCEEDED,
   START_ASYNC_VALIDATION,
@@ -68,6 +69,8 @@ import type {
   ClearSubmitErrors,
   ClearAsyncErrorAction,
   ClearAsyncError,
+  ClearFieldsAction,
+  ClearFields,
   DestroyAction,
   Destroy,
   FocusAction,
@@ -232,8 +235,8 @@ const change: Change = (
   form: string,
   field: string,
   value: any,
-  touch: boolean,
-  persistentSubmitErrors: boolean
+  touch?: boolean,
+  persistentSubmitErrors?: boolean
 ): ChangeAction => ({
   type: CHANGE,
   meta: { form, field, touch, persistentSubmitErrors },
@@ -258,6 +261,16 @@ const clearAsyncError: ClearAsyncError = (
 ): ClearAsyncErrorAction => ({
   type: CLEAR_ASYNC_ERROR,
   meta: { form, field }
+})
+
+const clearFields: ClearFields = (
+  form: string,
+  keepTouched: boolean,
+  persistentSubmitErrors: boolean,
+  ...fields: string[]
+): ClearFieldsAction => ({
+  type: CLEAR_FIELDS,
+  meta: { form, keepTouched, persistentSubmitErrors, fields }
 })
 
 const destroy: Destroy = (...form: string[]): DestroyAction => ({
@@ -415,6 +428,7 @@ const actions = {
   autofill,
   blur,
   change,
+  clearFields,
   clearSubmit,
   clearSubmitErrors,
   clearAsyncError,

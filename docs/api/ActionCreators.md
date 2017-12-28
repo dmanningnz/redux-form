@@ -13,7 +13,7 @@ form, and, in the case of field-specific actions such as `CHANGE` or `BLUR`, the
 
 ### `arrayMove(form:String, field:String, from:Number, to:Number)`
 
-> Moves an item from one index in the array to another. In effect, it performs a remove and an 
+> Moves an item from one index in the array to another. In effect, it performs a remove and an
 insert, so the item already at the `to` position will be bumped to a higher index, not overwritten.
 
 ### `arrayPop(form:String, field:String)`
@@ -63,7 +63,15 @@ insert, so the item already at the `to` position will be bumped to a higher inde
 
 ### `clearSubmitErrors(form:String)`
 
-> Removes `submitErrors` and `error`. 
+> Removes `submitErrors` and `error`.
+
+### `clearFields(form:String, keepTouched: boolean, persistentSubmitErrors: boolean, ...fields:String)`
+
+> Cleans fields values for all the fields passed in.
+
+> If the `keepTouched` parameter is `true`, the values of currently touched fields will be retained
+> If the `persistentSubmitErrors` parameter is `true`, the values of currently submit errors fields will be retained
+
 
 ### `destroy(...forms:String)`
 
@@ -73,7 +81,7 @@ insert, so the item already at the `to` position will be bumped to a higher inde
 
 > Marks the given field as `active` and `visited`.
 
-### `initialize(form:String, data:Object, [keepDirty:boolean], [options:{keepDirty:boolean, keepSubmitSucceeded:boolean}])`
+### `initialize(form:String, data:Object, [keepDirty:boolean], [options:{keepDirty:boolean, keepSubmitSucceeded:boolean, updateUnregisteredFields:boolean}])`
 
 > Sets the initial values in the form with which future data values will be compared to calculate
 `dirty` and `pristine`. The `data` parameter may contain deep nested array and object values that match the shape of
@@ -83,8 +91,12 @@ your form fields.
 to avoid overwriting user edits.  (`keepDirty` can appear as either the third argument, or a property of `options` as
 the 3rd or 4th argument, for the sake of backwards compatibility).
 
-> If the `keepSubmitSucceeded` parameter is `true`, 
+> If the `keepSubmitSucceeded` parameter is `true`,
 it will not clear the `submitSucceeded` flag if it is set.
+
+> If the `updateUnregisteredFields` parameter is `true`,
+it will update every initialValue if still pristine instead of only registered fields.
+Highly recommended, defaults to false because of non-breaking backwards compatibility. 
 
 ### `registerField(form:String, name:String, type:String)`
 
@@ -96,7 +108,7 @@ it will not clear the `submitSucceeded` flag if it is set.
 
 ### `setSubmitFailed(form:String, ...fields:String)`
 
-> Flips `submitFailed` flag `true`, removes `submitSucceeded` and `submitting`, marks all the fields passed in as `touched`, and if at least one field was passed flips `anyTouched` to `true`. 
+> Flips `submitFailed` flag `true`, removes `submitSucceeded` and `submitting`, marks all the fields passed in as `touched`, and if at least one field was passed flips `anyTouched` to `true`.
 
 ### `setSubmitSucceeded(form:String)`
 
